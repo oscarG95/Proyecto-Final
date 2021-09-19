@@ -61,7 +61,7 @@ def load():
 #     return render_template('filtrarPeliculas.html')
 
 @app.route('/filtrarXpelicula', methods=['POST', 'GET'])
-def pelicula2():
+def filtrarPorPelicula():
     if request.method == 'POST':
         movie = request.form["movie"]
         dfResult = consultas.consultar(f"select * from tablaMovies where Title='{movie}'")
