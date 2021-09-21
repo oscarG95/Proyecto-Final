@@ -35,6 +35,20 @@ def load():
     guardar.cargarDatos()
     return "Datos cargados"
 
+#Metodo para filtrar pelicula por nombre
+@app.route('/filtrarXpelicula', methods=['POST', 'GET'])
+def filtrarPorPelicula():
+    if request.method == 'POST':
+        movie = request.form["movie"]
+        dfResult = consultas.consultar(f"select * from tablaMovies where Title='{movie}'")
+        dfResult.index = dfResult.index + 1
+        dfResult.__delitem__('index')
+        dfResult.to_html('./templates/todos.html')
+        return render_template('filtrarXmovie.html')
+    else:
+        dfResult= consultas.consultar(f"select * from tablaMovies")
+        dfResult.to_html('./templates/todos.html', table_id="tblPelis", index=False, index_names=False)
+        return render_template('filtrarXmovie.html')
 
 
 
@@ -60,17 +74,10 @@ def load():
 
 #     return render_template('filtrarPeliculas.html')
 
-@app.route('/filtrarXpelicula', methods=['POST', 'GET'])
-def filtrarPorPelicula():
-    if request.method == 'POST':
-        movie = request.form["movie"]
-        dfResult = consultas.consultar(f"select * from tablaMovies where Title='{movie}'")
-        dfResult.to_html('./templates/todos.html')
-        return render_template('filtrarXmovie.html')
-    else:
-        dfResult= consultas.consultar(f"select * from tablaMovies")
-        dfResult.to_html('./templates/todos.html', table_id="tblPelis", index=False, index_names=False)
-        return render_template('filtrarXmovie.html')
-        
+@app.route('/prueba')
+def prueba():
+    dfResult = consultas.consultar(f"SELECT  Pelicula,SUM(AsistenciaSemanal) AS Asistencia_Semanal, Year FROM tablaMovies WHERE Year = '2019' GROUP BY Pelicula")
+    dfResult.to_html('./templates/todos.html', table_id="myTable", index=False, index_names=False)
+    return render_template('todasPelis.html')   
 if __name__ == "__main__":
     app.run(debug=True)

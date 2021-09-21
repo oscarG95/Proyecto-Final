@@ -50,6 +50,10 @@ def cargarDatos():
 
     dFrameProcesado = dframe.iloc[:,[1,4,5,15,23,34,42,46,47,48,49]]
 
+    dFrameProcesado.columns = ['Pelicula','Cine','Cadena','AsistenciFinde','AsistenciaSemanal','RecaudacionFinde','ReaudacionSemanal','Pais','StartDate','EndDate','Year'] 
+
+
+
 # Crear tabla en la base de datos e insertarlos
     engine = create_engine('sqlite:///movies.db', echo=True,)
     sqlite_connection = engine.connect()
