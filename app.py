@@ -118,5 +118,16 @@ def asistenciaPorCadena():
     return render_template('asistenciaPorCadena.html')
 
 
+@app.route('/asistenciaporpelicula')
+def asistenciaPorPelicula():
+    dfResult = consultas.consultar(
+        "SELECT  Pais, Pelicula,SUM(AsistenciaSemanal) AS ASISTENCIA_SEMANAL FROM tablaMovies GROUP BY Pelicula, Pais order by ASISTENCIA_SEMANAL DESC")
+    # dfResult.index = dfResult.index + 1
+    # dfResult.__delitem__('index')
+    dfResult.to_html('./templates/todos.html', table_id="tblTodos", index=False,
+                     index_names=False, justify='left', classes="display cell-border")
+    return render_template('asistenciaPorPelicula.html')
+
+
 if __name__ == "__main__":
     app.run(debug=True)

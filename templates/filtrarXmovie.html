@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-     
+
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,18 +13,18 @@
 
 <body>
     <h1>Todas las peliculas </h1>
-    
+
     <form method="POST" action="#" name="formFiltrarXmovie">
         <p>Ingrese el nombre de la pelicula: </p>
         <p><input type="text" name="movie"></p>
         <p><input type="submit" value="submit"></p>
-          </form>
+    </form>
 
-     <div id='tabla'>
+    <div id='tabla'>
         {% include 'todos.html' without context %}
-     </div>
-    
-     
+    </div>
+
+
 </body>
 
 
