@@ -42,7 +42,7 @@
     </script>
   </div>
 
-
+  {% block nav %}
   <ul class="nav nav-tabs">
     <li class="nav-item">
       <a class="nav-link" href="/load">Cargar Datos</a>
@@ -58,26 +58,11 @@
     </li>
     <li class="nav-item">
       <a class="nav-link" href="/asistenciaporpelicula">Asistencia por Pelicula y Pais</a>
-  </li>
+    </li>
   </ul>
-
-  <!-- <ul class="nav nav-tabs">
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Inicio</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/movies">Filtrar por peliculas</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Link</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link disabled">Disabled</a>
-        </li>
-      </ul> -->
+  {% endblock %}
 
   <h1>Todas las peliculas</h1>
-
 
   {% include 'todos.html' without context %}
 
