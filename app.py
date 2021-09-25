@@ -32,8 +32,6 @@ def consultarTodos():
     dfResult.index = dfResult.index + 1
     dfResult.__delitem__('index')
 
-    
-
     dfResult.to_html('./templates/todos.html', table_id="tblTodos", index=True,
                      index_names=False, justify='left', classes="display cell-border")
     return render_template('todasPelis.html')
@@ -66,6 +64,17 @@ def filtrarPorPelicula():
         return render_template('filtrarXmovie.html')
 
 
+def filtarFecha(dfResult):
+    # dfResult[['StartDate', 'EndDate']] = dfResult[['StartDate', 'EndDate']].apply((pd.to_datetime(format="%m/%d")))
+    dfResult['StartDate'] = dfResult['StartDate'].map(
+        str) + "/" + dfResult['Year']
+    dfResult['EndDate'] = dfResult['EndDate'].map(str) + "/" + dfResult['Year']
+    dfResult['StartDate'] = pd.to_datetime(
+        (dfResult['StartDate']), format="%m/%d/%Y")
+    dfResult['EndDate'] = pd.to_datetime(
+        (dfResult['EndDate']), format="%m/%d/%Y")
+    return dfResult
+
 # # Consultar por peliculas pasando el nombre de una pelicula como argumento
 # @app.route('/movies', methods=['POST', 'GET'])
 # def pelicula():
@@ -88,16 +97,28 @@ def filtrarPorPelicula():
 
 #     return render_template('filtrarPeliculas.html')
 
-@app.route('/prueba')
+@app.route('/prueba', methods=['POST', 'GET'])
 def prueba():
-    dfResult = consultas.consultar(
-        f"SELECT  Pelicula,SUM(AsistenciaSemanal) AS Asistencia_Semanal, Year FROM tablaMovies WHERE Year = '2019' GROUP BY Pelicula")
+    if request.method == 'POST':
+        startDate = request.form['startD']
+        endDate = request.form['endD']
+        dfResult = consultas.consultar2(
+            f"SELECT * from TablaMovies where StartDate BETWEEN'{startDate}' AND '{endDate}'")
+        dfResult.index = dfResult.index + 1
+        dfResult.__delitem__('index')
+
+        dfResult.to_html('./templates/todos.html', table_id="tblTodos",
+                         index_names=False, justify='left', classes="display cell-border")
+
+        return render_template('prueba.html')
+    else:
+        dfResult = consultas.consultar2("select * from tablaMovies limit 1000")
     dfResult.index = dfResult.index + 1
     dfResult.__delitem__('index')
-    
-    dfResult.to_html('./templates/todos.html',
-                     table_id="myTable", index=False, index_names=False)
-    return render_template('todasPelis.html')
+
+    dfResult.to_html('./templates/todos.html', table_id="tblTodos", index=True,
+                     index_names=False, justify='left', classes="display cell-border")
+    return render_template('prueba.html')
 
 
 @app.route('/asistenciaporpais')
@@ -107,8 +128,6 @@ def asistenciaPorPais():
     # dfResult.index = dfResult.index + 1
     # dfResult.__delitem__('index')
 
-   
-    
     dfResult.to_html('./templates/todos.html', table_id="tblTodos", index=False,
                      index_names=False, justify='left', classes="display cell-border")
     return render_template('asistenciaPais.html')
@@ -120,7 +139,8 @@ def asistenciaPorCadena():
         "SELECT Cadena ,sum(AsistenciaSemanal) as Asistencia_Semanal, Pais FROM tablaMovies group by Cadena, Pais order by Pais")
     # dfResult.index = dfResult.index + 1
     # dfResult.__delitem__('index')
-    dfResult['Porcentaje']= (dfResult['Asistencia_Semanal']/dfResult['Asistencia_Semanal'].sum()) * 100
+    dfResult['Porcentaje'] = (
+        dfResult['Asistencia_Semanal']/dfResult['Asistencia_Semanal'].sum()) * 100
     dfResult.to_html('./templates/todos.html', table_id="tblTodos", index=False,
                      index_names=False, justify='left', classes="display cell-border")
     return render_template('asistenciaPorCadena.html')
@@ -132,11 +152,11 @@ def asistenciaPorPelicula():
         "SELECT  Pais, Pelicula,SUM(AsistenciaSemanal) AS Asistencia_Semanal FROM tablaMovies GROUP BY Pelicula, Pais order by Asistencia_Semanal DESC limit 5")
     # dfResult.index = dfResult.index + 1
     # dfResult.__delitem__('index')
-    dfResult['Porcentaje']= (dfResult['Asistencia_Semanal']/dfResult['Asistencia_Semanal'].sum()) * 100
+    dfResult['Porcentaje'] = (
+        dfResult['Asistencia_Semanal']/dfResult['Asistencia_Semanal'].sum()) * 100
     dfResult.to_html('./templates/todos.html', table_id="tblTodos", index=False,
                      index_names=False, justify='left', classes="display cell-border")
     return render_template('asistenciaPorPelicula.html')
-
 
 
 if __name__ == "__main__":

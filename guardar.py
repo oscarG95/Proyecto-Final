@@ -8,6 +8,15 @@ from sqlalchemy import create_engine
 import xlrd
 data = pd.DataFrame()
 
+def filtarFecha(dfResult):
+    #dfResult[['StartDate', 'EndDate']] = dfResult[['StartDate', 'EndDate']].apply((pd.to_datetime(format="%m/%d")))
+    dfResult['StartDate'] = dfResult['StartDate'].map(str) + "/" + dfResult['Year']
+    dfResult['EndDate'] = dfResult['EndDate'].map(str) + "/" + dfResult['Year']
+    dfResult['StartDate'] = pd.to_datetime((dfResult['StartDate']), format="%m/%d/%Y")
+    dfResult['EndDate'] = pd.to_datetime((dfResult['EndDate']), format="%m/%d/%Y")
+    # dfResult.__delitem__('Year')
+    return dfResult
+
 #############################################
 def leer(ruta):
     archivo = ruta
@@ -51,7 +60,7 @@ def cargarDatos():
     dFrameProcesado = dframe.iloc[:,[1,4,5,15,23,34,42,46,47,48,49]]
 
     dFrameProcesado.columns = ['Pelicula','Cine','Cadena','AsistenciaFinde','AsistenciaSemanal','RecaudacionFinde','RecaudacionSemanal','Pais','StartDate','EndDate','Year'] 
-
+    dFrameProcesado = filtarFecha(dFrameProcesado)
 
 
 # Crear tabla en la base de datos e insertarlos
