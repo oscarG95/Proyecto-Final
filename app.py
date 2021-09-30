@@ -238,7 +238,7 @@ def masvistasfinde():
         startDate = request.form['startD']
         endDate = request.form['endD']
         dfResult = consultas.consultar(
-            f"Select Cadena,Pais,Pelicula, max(AsistenciaFinde) as Asistencia_Finde from tablaMovies where StartDate BETWEEN'{startDate}' AND '{endDate}' group by Cadena, Pais order by Asistencia_Semanal DESC")
+            f"Select Cadena,Pais,Pelicula, max(AsistenciaFinde) as Asistencia_Finde from tablaMovies where StartDate BETWEEN'{startDate}' AND '{endDate}' group by Cadena, Pais order by Asistencia_Finde DESC")
         total = dfResult['Asistencia_Finde'].sum()
         dfResult['Porcentaje'] = (
             dfResult['Asistencia_Finde']/dfResult['Asistencia_Finde'].sum()) * 100
@@ -350,7 +350,7 @@ def recaudacionPais():
         startDate = request.form['startD']
         endDate = request.form['endD']
         dfResult = consultas.consultar(
-            f"Select  select Pais, sum(RecaudacionSemanal) as Recaudacion from tablaMovies where StartDate BETWEEN'{startDate}' AND '{endDate}'  group by Pais")
+            f"Select Pais, sum(RecaudacionSemanal) as Recaudacion from tablaMovies where StartDate BETWEEN'{startDate}' AND '{endDate}'  group by Pais")
         dfResult=aproximar(dfResult)
         total = dfResult['Recaudacion'].sum()
         dfResult['Porcentaje'] = (
@@ -377,7 +377,7 @@ def recaudacionCadena():
         startDate = request.form['startD']
         endDate = request.form['endD']
         dfResult = consultas.consultar(
-            f"Select  select Cadena, Pais, sum(RecaudacionSemanal) as Recaudacion from tablaMovies where StartDate BETWEEN'{startDate}' AND '{endDate}'  group by Cadena,Pais")
+            f"Select Cadena, Pais, sum(RecaudacionSemanal) as Recaudacion from tablaMovies where StartDate BETWEEN'{startDate}' AND '{endDate}'  group by Cadena,Pais")
         dfResult=aproximar(dfResult)
         total = dfResult['Recaudacion'].sum()
         dfResult['Porcentaje'] = (
@@ -405,7 +405,7 @@ def recaudacionPelicula():
         startDate = request.form['startD']
         endDate = request.form['endD']
         dfResult = consultas.consultar(
-            f"Select  select Pelicula, sum(RecaudacionSemanal) as Recaudacion from tablaMovies where StartDate BETWEEN'{startDate}' AND '{endDate}'  group by Pelicula")
+            f"Select  Pelicula, sum(RecaudacionSemanal) as Recaudacion from tablaMovies where StartDate BETWEEN'{startDate}' AND '{endDate}'  group by Pelicula")
         dfResult=aproximar(dfResult)
         total = dfResult['Recaudacion'].sum()
         dfResult['Porcentaje'] = (
@@ -425,6 +425,33 @@ def recaudacionPelicula():
                          index_names=False, justify='left', classes="display cell-border")
         return render_template('vista2.html', total=total, descripcion=descripcion)
 
+@app.route('/recaudacionpeliculaporcadena', methods=['POST','GET'])
+def recaudacionPeliculaCadena():
+    descripcion = "Recaudacion Pelicula por Cadena"
+    if request.method == 'POST':
+        startDate = request.form['startD']
+        endDate = request.form['endD']
+        dfResult = consultas.consultar(
+            f"Select  Pelicula,Cadena,Pais, sum(RecaudacionSemanal) as Recaudacion from tablaMovies where StartDate BETWEEN'{startDate}' AND '{endDate}'  group by Pelicula, Cadena")
+        dfResult=aproximar(dfResult)
+        dfResult.index = dfResult.index + 1
+        total = dfResult['Recaudacion'].sum()
+        dfResult['Porcentaje'] = (
+            dfResult['Recaudacion']/dfResult['Recaudacion'].sum()) * 100
+        dfResult.to_html('./templates/todos.html', table_id="tblTodos", index=True,
+                         index_names=False, justify='left', classes="display cell-border")
+        return render_template('vista2.html', total=total, descripcion=descripcion)
+    else:
+        dfResult = consultas.consultar(
+            f"select Pelicula, Cadena, Pais, sum(RecaudacionSemanal) as Recaudacion from tablaMovies group by Pelicula, Cadena")
+        dfResult.index = dfResult.index + 1
+        dfResult=aproximar(dfResult)
+        total = dfResult['Recaudacion'].sum()
+        dfResult['Porcentaje'] = (
+            dfResult['Recaudacion']/dfResult['Recaudacion'].sum()) * 100
+        dfResult.to_html('./templates/todos.html', table_id="tblTodos", index=True,
+                         index_names=False, justify='left', classes="display cell-border")
+        return render_template('vista2.html', total=total, descripcion=descripcion)
 
 
 if __name__ == "__main__":
