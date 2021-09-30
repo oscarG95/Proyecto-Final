@@ -14,7 +14,7 @@ def filtarFecha(dfResult):
     dfResult['EndDate'] = dfResult['EndDate'].map(str) + "/" + dfResult['Year']
     dfResult['StartDate'] = pd.to_datetime((dfResult['StartDate']), format="%m/%d/%Y")
     dfResult['EndDate'] = pd.to_datetime((dfResult['EndDate']), format="%m/%d/%Y")
-    # dfResult.__delitem__('Year')
+    dfResult.__delitem__('Year')
     return dfResult
 
 #############################################

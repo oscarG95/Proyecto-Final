@@ -75,27 +75,11 @@ def filtarFecha(dfResult):
         (dfResult['EndDate']), format="%m/%d/%Y")
     return dfResult
 
-# # Consultar por peliculas pasando el nombre de una pelicula como argumento
-# @app.route('/movies', methods=['POST', 'GET'])
-# def pelicula():
-#     if request.method == 'POST':
-#         movie = request.form["movie"]
-#         return redirect(url_for("consultarPelicula",movie=movie))
-#     else:
-#         return render_template('filtrarXmovie.html')
+def aproximar(dfTodos):
+    decimals = 2    
+    dfTodos['Recaudacion'] = dfTodos['Recaudacion'].apply(lambda x: round(x, decimals))
+    return dfTodos
 
-
-# @app.route('/movies/<movie>', methods=['POST', 'GET'])
-# def consultarPelicula(movie):
-#     movie2=movie
-#     dfResult = consultas.consultar(f"select * from tablaMovies where Title='{movie2}'")
-#     dfResult.to_html('./templates/todos.html')
-#     movie = request.form["movie"]
-#     pelicula()
-#     # movie = request.form["movie"]
-#     # return redirect(url_for('pelicula',movie=movie))
-
-#     return render_template('filtrarPeliculas.html')
 
 @app.route('/prueba', methods=['POST', 'GET'])
 def prueba():
@@ -113,51 +97,259 @@ def prueba():
         return render_template('prueba.html')
     else:
         dfResult = consultas.consultar2("select * from tablaMovies limit 1000")
-    dfResult.index = dfResult.index + 1
-    dfResult.__delitem__('index')
+        dfResult.index = dfResult.index + 1
+        dfResult.__delitem__('index')
 
-    dfResult.to_html('./templates/todos.html', table_id="tblTodos", index=True,
-                     index_names=False, justify='left', classes="display cell-border")
-    return render_template('prueba.html')
+        dfResult.to_html('./templates/todos.html', table_id="tblTodos", index=True,
+                         index_names=False, justify='left', classes="display cell-border")
+        return render_template('prueba.html')
 
 
-@app.route('/asistenciaporpais')
+# Total  de asistencia semanal para cada país
+@app.route('/asistenciaporpais', methods=['POST', 'GET'])
 def asistenciaPorPais():
-    dfResult = consultas.consultar(
-        "select Pais, sum(AsistenciaSemanal) as Asistencia_Semanal from tablaMovies group BY Pais")
-    # dfResult.index = dfResult.index + 1
-    # dfResult.__delitem__('index')
+    descripcion = "Total  de asistencia semanal para cada país:"
+    if request.method == 'POST':
+        startDate = request.form['startD']
+        endDate = request.form['endD']
+        dfResult = consultas.consultar(
+            f"select Pais, sum(AsistenciaSemanal) as Asistencia_Semanal from tablaMovies where StartDate BETWEEN'{startDate}' AND '{endDate}'  group BY Pais")
+        dfResult.index = dfResult.index + 1
+        total = dfResult['Asistencia_Semanal'].sum()
+        dfResult.to_html('./templates/todos.html', table_id="tblTodos", index=False,
+                         index_names=False, justify='left', classes="display cell-border")
+        return render_template('vista.html', total=total, descripcion=descripcion)
+    else:
+        dfResult = consultas.consultar(
+            f"select Pais, sum(AsistenciaSemanal) as Asistencia_Semanal from tablaMovies group BY Pais")
+        dfResult.index = dfResult.index + 1
+        total = dfResult['Asistencia_Semanal'].sum()
+        dfResult.to_html('./templates/todos.html', table_id="tblTodos", index=True,
+                         index_names=False, justify='left', classes="display cell-border")
+        return render_template('vista.html', total=total, descripcion=descripcion)
 
-    dfResult.to_html('./templates/todos.html', table_id="tblTodos", index=False,
-                     index_names=False, justify='left', classes="display cell-border")
-    return render_template('asistenciaPais.html')
 
-
-@app.route('/asistenciaporcadena')
+# Total de sistencia semanal por cadena de cine para cada país
+@app.route('/asistenciaporcadena', methods=['POST', 'GET'])
 def asistenciaPorCadena():
-    dfResult = consultas.consultar(
-        "SELECT Cadena ,sum(AsistenciaSemanal) as Asistencia_Semanal, Pais FROM tablaMovies group by Cadena, Pais order by Pais")
-    # dfResult.index = dfResult.index + 1
-    # dfResult.__delitem__('index')
-    dfResult['Porcentaje'] = (
-        dfResult['Asistencia_Semanal']/dfResult['Asistencia_Semanal'].sum()) * 100
-    dfResult.to_html('./templates/todos.html', table_id="tblTodos", index=False,
-                     index_names=False, justify='left', classes="display cell-border")
-    return render_template('asistenciaPorCadena.html')
+    descripcion = "Asistencia por cadena de cine"
+    if request.method == 'POST':
+        startDate = request.form['startD']
+        endDate = request.form['endD']
+        dfResult = consultas.consultar(
+            f"SELECT Cadena ,sum(AsistenciaSemanal) as Asistencia_Semanal, Pais FROM tablaMovies where StartDate BETWEEN'{startDate}' AND '{endDate}'  group BY Cadena ORDER BY Pais")
+        dfResult.index = dfResult.index + 1
+        total = dfResult['Asistencia_Semanal'].sum()
+        dfResult.to_html('./templates/todos.html', table_id="tblTodos", index=False,
+                         index_names=False, justify='left', classes="display cell-border")
+        return render_template('vista.html', total=total, descripcion=descripcion)
+    else:
+        dfResult = consultas.consultar(
+            f"SELECT Cadena ,sum(AsistenciaSemanal) as Asistencia_Semanal, Pais FROM tablaMovies group BY Cadena ORDER BY Pais")
+        dfResult.index = dfResult.index + 1
+        total = dfResult['Asistencia_Semanal'].sum()
+        dfResult.to_html('./templates/todos.html', table_id="tblTodos", index=True,
+                         index_names=False, justify='left', classes="display cell-border")
+        return render_template('vista.html', total=total, descripcion=descripcion)
 
 
-@app.route('/asistenciaporpelicula')
+# Top 5 Peliculas Mayor Asistencia
+@app.route('/asistenciaporpelicula', methods=['POST', 'GET'])
 def asistenciaPorPelicula():
-    dfResult = consultas.consultar(
-        "SELECT  Pais, Pelicula,SUM(AsistenciaSemanal) AS Asistencia_Semanal FROM tablaMovies GROUP BY Pelicula, Pais order by Asistencia_Semanal DESC limit 5")
-    # dfResult.index = dfResult.index + 1
-    # dfResult.__delitem__('index')
-    dfResult['Porcentaje'] = (
-        dfResult['Asistencia_Semanal']/dfResult['Asistencia_Semanal'].sum()) * 100
-    dfResult.to_html('./templates/todos.html', table_id="tblTodos", index=False,
-                     index_names=False, justify='left', classes="display cell-border")
-    return render_template('asistenciaPorPelicula.html')
+    descripcion = "Top 5 Peliculas Mayor Asistencia:"
+    if request.method == 'POST':
+        startDate = request.form['startD']
+        endDate = request.form['endD']
+        dfResult = consultas.consultar(
+            f"Select  Pelicula, sum(AsistenciaSemanal) as Asistencia_Semanal from tablaMovies where StartDate BETWEEN'{startDate}' AND '{endDate}'  group BY Pelicula ORDER BY Asistencia_Semanal DESC limit 5")
+        dfResult.index = dfResult.index + 1
+        total = dfResult['Asistencia_Semanal'].sum()
+        dfResult.to_html('./templates/todos.html', table_id="tblTodos", index=True,
+                         index_names=False, justify='left', classes="display cell-border")
+        return render_template('vista.html', total=total, descripcion=descripcion)
+    else:
+        dfResult = consultas.consultar(
+            f"Select  Pelicula, sum(AsistenciaSemanal) as Asistencia_Semanal from tablaMovies group by Pelicula order by Asistencia_Semanal DESC limit 5")
+        dfResult.index = dfResult.index + 1
+        total = dfResult['Asistencia_Semanal'].sum()
+        dfResult.to_html('./templates/todos.html', table_id="tblTodos", index=True,
+                         index_names=False, justify='left', classes="display cell-border")
+        return render_template('vista.html', total=total, descripcion=descripcion)
 
+
+
+# Películas con mayor asistencia por cada cadena de cine
+@app.route('/peliculasporcadena', methods=['POST', 'GET'])
+def asistenciaPorPeliculas():
+    descripcion = "Asistencia por Cadena"
+    if request.method == 'POST':
+        startDate = request.form['startD']
+        endDate = request.form['endD']
+        dfResult = consultas.consultar(
+            f"Select  Cadena, Pelicula, sum(AsistenciaSemanal) as Asistencia_Semanal from tablaMovies where StartDate BETWEEN'{startDate}' AND '{endDate}'  group by Pelicula ORDER BY Asistencia_Semanal DESC")
+        total = dfResult['Asistencia_Semanal'].sum()
+        dfResult['Porcentaje'] = (
+            dfResult['Asistencia_Semanal']/dfResult['Asistencia_Semanal'].sum()) * 100
+        dfResult.to_html('./templates/todos.html', table_id="tblTodos", index=False,
+                         index_names=False, justify='left', classes="display cell-border")
+        return render_template('vista.html', total=total, descripcion=descripcion)
+    else:
+        dfResult = consultas.consultar(
+            f"Select  Cadena, Pelicula, sum(AsistenciaSemanal) as Asistencia_Semanal from tablaMovies group by Pelicula order by Asistencia_Semanal")
+        dfResult.index = dfResult.index + 1
+        total = dfResult['Asistencia_Semanal'].sum()
+        dfResult['Porcentaje'] = (
+            dfResult['Asistencia_Semanal']/dfResult['Asistencia_Semanal'].sum()) * 100
+        dfResult.to_html('./templates/todos.html', table_id="tblTodos", index=True,
+                         index_names=False, justify='left', classes="display cell-border")
+        return render_template('vista.html', total=total, descripcion=descripcion)
+
+
+#Peliculas más vistas por cadena y pais
+@app.route('/peliculasporcadenapais', methods=['POST', 'GET'])
+def pelicula_Cadena_Pais():
+    descripcion = "Peliculas por Cadena,Pais"
+    if request.method == 'POST':
+        startDate = request.form['startD']
+        endDate = request.form['endD']
+        dfResult = consultas.consultar(
+            f"Select Pais, Pelicula,Cadena,sum(AsistenciaSemanal) as Asistencia_Semanal from tablaMovies where StartDate BETWEEN'{startDate}' AND '{endDate}' group by Pelicula,Cadena order by Pais,Asistencia_Semanal DESC")
+        total = dfResult['Asistencia_Semanal'].sum()
+        dfResult['Porcentaje'] = (
+            dfResult['Asistencia_Semanal']/dfResult['Asistencia_Semanal'].sum()) * 100
+        dfResult.to_html('./templates/todos.html', table_id="tblTodos", index=False,
+                         index_names=False, justify='left', classes="display cell-border")
+        return render_template('vista.html', total=total, descripcion=descripcion)
+    else:
+        dfResult = consultas.consultar(
+            f"Select Pais, Pelicula,Cadena,sum(AsistenciaSemanal) as Asistencia_Semanal from tablaMovies group by Pelicula, Cadena order by Pais,Asistencia_Semanal DESC")
+        dfResult.index = dfResult.index + 1
+        total = dfResult['Asistencia_Semanal'].sum()
+        dfResult['Porcentaje'] = (
+            dfResult['Asistencia_Semanal']/dfResult['Asistencia_Semanal'].sum()) * 100
+        dfResult.to_html('./templates/todos.html', table_id="tblTodos", index=True,
+                         index_names=False, justify='left', classes="display cell-border")
+        return render_template('vista.html', total=total, descripcion=descripcion)
+
+#Peliculas mas vistas en fin de semana
+@app.route('/peliculasfinde', methods=['POST', 'GET'])
+def masvistasfinde():
+    descripcion = "Películas mas vistas en Finde"
+    if request.method == 'POST':
+        startDate = request.form['startD']
+        endDate = request.form['endD']
+        dfResult = consultas.consultar(
+            f"Select Pais, Pelicula,Cadena,Pais, sum(AsistenciaFinde) as Asistencia_Finde from tablaMovies where StartDate BETWEEN'{startDate}' AND '{endDate}' group by Pelicula,Pais order by Asistencia_Semanal DESC")
+        total = dfResult['Asistencia_Finde'].sum()
+        dfResult['Porcentaje'] = (
+            dfResult['Asistencia_Finde']/dfResult['Asistencia_Finde'].sum()) * 100
+        dfResult.to_html('./templates/todos.html', table_id="tblTodos", index=False,
+                         index_names=False, justify='left', classes="display cell-border")
+        return render_template('vista.html', total=total, descripcion=descripcion)
+    else:
+        dfResult = consultas.consultar(
+            f"Select  Pelicula, Cadena, Pais, sum(AsistenciaFinde) as Asistencia_Finde from tablaMovies group by Pelicula,Pais Order By Asistencia_Finde DESC")
+        dfResult.index = dfResult.index + 1
+        total = dfResult['Asistencia_Finde'].sum()
+        dfResult['Porcentaje'] = (
+            dfResult['Asistencia_Finde']/dfResult['Asistencia_Finde'].sum()) * 100
+        dfResult.to_html('./templates/todos.html', table_id="tblTodos", index=True,
+                         index_names=False, justify='left', classes="display cell-border")
+        return render_template('vista.html', total=total, descripcion=descripcion)
+
+
+########################################################################################################################################
+# Peliculas con mayor recaudacion por pais
+@app.route('/mayorrecaudacion_pais', methods=['POST', 'GET'])
+def mayorRecaudacion():
+    descripcion = "Peliculas mas taquillera en cada pais"
+    if request.method == 'POST':
+        startDate = request.form['startD']
+        endDate = request.form['endD']
+        dfResult = consultas.consultar(
+            f"Select  Pais, Pelicula, max(RecaudacionSemanal) as Recaudacion from tablaMovies where StartDate BETWEEN'{startDate}' AND '{endDate}'  group by Pais")
+        dfResult=aproximar(dfResult)
+        total = dfResult['Recaudacion'].sum()
+        dfResult['Porcentaje'] = (
+            dfResult['Recaudacion']/dfResult['Recaudacion'].sum()) * 100
+        dfResult.to_html('./templates/todos.html', table_id="tblTodos", index=True,
+                         index_names=False, justify='left', classes="display cell-border")
+        return render_template('vista2.html', total=total, descripcion=descripcion)
+    else:
+        dfResult = consultas.consultar(
+            f"Select  Pais, Pelicula, max(RecaudacionSemanal) as Recaudacion from tablaMovies group by Pais")
+        dfResult.index = dfResult.index + 1
+        dfResult=aproximar(dfResult)
+        total = dfResult['Recaudacion'].sum()
+        dfResult['Porcentaje'] = (
+            dfResult['Recaudacion']/dfResult['Recaudacion'].sum()) * 100
+        dfResult.to_html('./templates/todos.html', table_id="tblTodos", index=True,
+                         index_names=False, justify='left', classes="display cell-border")
+        return render_template('vista2.html', total=total, descripcion=descripcion)
+
+# Peliculas con mayor recaudacion por Cadena
+@app.route('/mayorrecaudacion_cadena', methods=['POST', 'GET'])
+def mayorRecaudacion_Cadena():
+    descripcion = "Peliculas mas taquillera en cada Cadena"
+    if request.method == 'POST':
+        startDate = request.form['startD']
+        endDate = request.form['endD']
+        dfResult = consultas.consultar(
+            f"Select  Cadena, Pelicula, Pais, max(RecaudacionSemanal) as Recaudacion from tablaMovies where StartDate BETWEEN'{startDate}' AND '{endDate}'  group by Cadena, Pais")
+        dfResult=aproximar(dfResult)
+        total = dfResult['Recaudacion'].sum()
+        dfResult['Porcentaje'] = (
+            dfResult['Recaudacion']/dfResult['Recaudacion'].sum()) * 100
+        dfResult.to_html('./templates/todos.html', table_id="tblTodos", index=True,
+                         index_names=False, justify='left', classes="display cell-border")
+        return render_template('vista2.html', total=total, descripcion=descripcion)
+    else:
+        dfResult = consultas.consultar(
+            f"Select  Cadena, Pelicula,Pais, max(RecaudacionSemanal) as Recaudacion from tablaMovies group by Cadena, Pais")
+        dfResult.index = dfResult.index + 1
+        dfResult=aproximar(dfResult)
+        total = dfResult['Recaudacion'].sum()
+        dfResult['Porcentaje'] = (
+            dfResult['Recaudacion']/dfResult['Recaudacion'].sum()) * 100
+        dfResult.to_html('./templates/todos.html', table_id="tblTodos", index=True,
+                         index_names=False, justify='left', classes="display cell-border")
+        return render_template('vista2.html', total=total, descripcion=descripcion)
+
+
+
+
+
+
+
+
+
+# Películas con mayor asistencia por cada cadena de cine
+@app.route('/asistenciaporpelicula_cadena')
+def asistenciaPorPelicula_cadena_pais():
+    if request.method == 'POST':
+        startDate = request.form['startD']
+        endDate = request.form['endD']
+        dfResult = consultas.consultar(
+            f"Select Cadena, Pelicula sum(AsistenciaSemanal) as Asistencia_Semanal from tablaMovies where StartDate BETWEEN'{startDate}' AND '{endDate}'   group by Cadena order by Asistencia_Semanal DESC")
+        total = dfResult['Asistencia_Semanal'].sum()
+        dfResult['Porcentaje'] = (
+            dfResult['Asistencia_Semanal']/dfResult['Asistencia_Semanal'].sum()) * 100
+        dfResult.to_html('./templates/todos.html', table_id="tblTodos", index=False,
+                         index_names=False, justify='left', classes="display cell-border")
+        return render_template('asistenciaPorPelicula_pais.html', total=total)
+    else:
+        dfResult = consultas.consultar(
+            f"Select  Cadena, Pelicula sum(AsistenciaSemanal) as Asistencia_Semanal from tablaMovies group by Cadena")
+        dfResult.index = dfResult.index + 1
+        total = dfResult['Asistencia_Semanal'].sum()
+        dfResult['Porcentaje'] = (
+            dfResult['Asistencia_Semanal']/dfResult['Asistencia_Semanal'].sum()) * 100
+        dfResult.to_html('./templates/todos.html', table_id="tblTodos", index=True,
+                         index_names=False, justify='left', classes="display cell-border")
+        return render_template('asistenciaPorPelicula_pais.html', total=total)
+
+
+# Total asistencia semanal de cada película por cadena de cine (porcentaje)
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -24,7 +24,11 @@
 
     <script type="text/javascript" charset="utf8"
         src="https://cdn.datatables.net/1.11.2/js/jquery.dataTables.js"></script>
-
+<!-- <style>
+    #tblTodos{
+        width: 80%;
+    }
+</style> -->
 
 </head>
 
@@ -63,11 +67,18 @@
     </ul>
 
     <h1>Asistencia Semanal por Pais: </h1>
-
-
+    <h6>Asistencia total: {{ total }}</h6>
+    <form method="POST" action="#" name="formFiltrarFecha">
+        <h3>Ingrese un rango de fechas: </h3>
+        <p>Fecha Inicial: <input type="date" name="startD"></p>
+        <p>Fecha Final: <input type="date" name="endD"></p>
+        <p><input type="submit" value="Consultar"></p>
+    </form>
+<div width="80%">
     {% include 'todos.html' without context %}
 
-
+</div>
+    
 </body>
 
 </html>

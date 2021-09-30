@@ -11,6 +11,7 @@ def consultar(consulta):
     dfTodos = pd.read_sql_query(consulta, engine)
     return dfTodos
 
+#Con esto aproximamos las colunnas con dinero
 def consultar2(consulta):
     dfTodos = pd.read_sql_query(consulta, engine)
     decimals = 2    

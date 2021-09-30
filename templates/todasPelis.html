@@ -25,7 +25,11 @@
   <script type="text/javascript" charset="utf8"
     src="https://cdn.datatables.net/1.11.2/js/jquery.dataTables.js"></script>
 
-
+    <style>
+      #tblTodos{
+          width: 80%;
+      }
+  </style>
 </head>
 
 <body>
@@ -42,7 +46,7 @@
     </script>
   </div>
 
-  {% block nav %}
+
   <ul class="nav nav-tabs">
     <li class="nav-item">
       <a class="nav-link" href="/load">Cargar Datos</a>
@@ -60,12 +64,13 @@
       <a class="nav-link" href="/asistenciaporpelicula">Asistencia por Pelicula y Pais</a>
     </li>
   </ul>
-  {% endblock %}
+
 
   <h1>Todas las peliculas</h1>
-
+<div width="80%">
   {% include 'todos.html' without context %}
 
+</div>
 
 </body>
 
