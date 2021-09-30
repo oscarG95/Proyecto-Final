@@ -2,78 +2,113 @@
 <html lang="en">
 
 <head>
-  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-  <script src="{{ url_for('static', filename='jquery.js') }}"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="{{ url_for('static', filename='jquery.js') }}"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 
-  <!-- Bootstrap -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-    crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
 
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Todas las peliculas</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todos los datos</title>
 
 
-  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.2/css/jquery.dataTables.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.2/css/jquery.dataTables.css">
 
-  <script type="text/javascript" charset="utf8"
-    src="https://cdn.datatables.net/1.11.2/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" charset="utf8"
+        src="https://cdn.datatables.net/1.11.2/js/jquery.dataTables.js"></script>
+<style>
+    #tblTodos{
+        width: 99%;
+    }
+</style>
 
-    <style>
-      #tblTodos{
-          width: 80%;
-      }
-  </style>
 </head>
 
 <body>
+    <div>
+        <script>
+
+            $(document).ready(function () {
+                $('#tblTodos').DataTable(
+
+                );
+            });
+        </script>
+    </div>
 
 
-  <div>
-    <script>
+    
 
-      $(document).ready(function () {
-        $('#tblTodos').DataTable(
+    
+    <ul class="nav nav-pills">
+        <li class="nav-item">
+            <a class="nav-link active" href="/load">Cargar Datos</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/todos">Todos los Datos</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/asistenciaporpais">Asistencia Semanal por Pais</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/asistenciaporcadena">Total Asistencia Cadena</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/asistenciapelicula">Asistencia Por Pelicula</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/asistenciaporpelicula">Top 5 Peliculas</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/peliculasporcadena">Mayor Asistencia por Cadena</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/peliculasporcadenapais">Peliculas por cadena y pais</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/peliculasfinde">Pel. más vistas finde</a>
+        </li>
 
-        );
-      });
-    </script>
-  </div>
+        <li class="nav-item">
+            <a class="nav-link" href="/recaudacionpais">Recaudacion por Pais</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/recaudacioncadena">Recaudacion por Cadena</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/recaudacionpelicula">Recaudacion por Pelicula</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/mayorrecaudacion_pais">Peliculas con mayor recaudacion(Pais)</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" href="/mayorrecaudacion_cadena">Peliculas con mayor recaudacion(Cadena)</a>
+        </li>
 
 
-  <ul class="nav nav-tabs">
-    <li class="nav-item">
-      <a class="nav-link" href="/load">Cargar Datos</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="/todos">Todas las peliculas</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="/asistenciaporpais">Asistencia Semanal por Pais</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="/asistenciaporcadena">Total Asistencia Cadena por pais</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="/asistenciaporpelicula">Asistencia por Pelicula y Pais</a>
-    </li>
-  </ul>
+    </ul>
 
-
-  <h1>Todas las peliculas</h1>
+    <h1>Todas los datos</h1>
+    <form method="POST" action="#" name="formFiltrarFecha">
+        <h3>Ingrese un rango de fechas: </h3>
+        <p>Fecha Inicial: <input type="date" name="startD"></p>
+        <p>Fecha Final: <input type="date" name="endD"></p>
+        <p><input type="submit" value="Consultar" class="btn btn-success"></p>
+    </form>
 <div width="80%">
-  {% include 'todos.html' without context %}
+    {% include 'todos.html' without context %}
 
 </div>
-
+    
 </body>
-
-
 
 </html>
